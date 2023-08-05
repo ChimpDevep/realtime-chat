@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #chat-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+    }
+
+    #chat-box {
+      height: 300px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .message-container {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .message-container img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    #message-input {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    #message {
+      flex-grow: 1;
+      padding: 5px;
+      font-size: 16px;
+    }
+
+    #send {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    #send:hover {
+      background-color: #0056b3;
+    }
+
+    #music-player {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 5px;
+      max-width: 250px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Chat, <span id="user-name"></span></h1>
+  <div id="chat-container">
+    <div id="chat-box"></div>
+    <div id="message-input">
+      <input type="text" id="message" placeholder="Type your message...">
+      <button id="send">Send</button>
+    </div>
+  </div>
+
+  <div id="music-player">
+    <input type="text" id="music-url" placeholder="Enter music/video URL...">
+    <button id="play">Play</button>
+    <button id="pause">Pause</button>
+  </div>
+
+  <script>
+    var username = localStorage.getItem("chat_username");
+
+    if (!username) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("user-name").innerText = username;
+    }
+
+    function displayMessage(user, message, avatarDataUrl) {
+      var chatBox = document.getElementById("chat-box");
+      var newMessage = document.createElement("div");
+      newMessage.classList.add("message-container");
+
+      if (avatarDataUrl) {
+        var avatarImg = document.createElement("img");
+        avatarImg.src = avatarDataUrl;
+        newMessage.appendChild(avatarImg);
+      }
+
+      var messageContent = document.createElement("div");
+      messageContent.innerText = user + ": " + message;
+      newMessage.appendChild(messageContent);
+
+      chatBox.appendChild(newMessage);
+    }
+
+    document.getElementById("send").addEventListener("click", function() {
+      var message = document.getElementById("message").value.trim();
+      if (message !== "") {
+        var avatarDataUrl = localStorage.getItem("chat_avatar_" + username);
+        displayMessage(username, message, avatarDataUrl);
+        localStorage.setItem("chat_message", JSON.stringify({ user: username, message: message, avatar: avatarDataUrl }));
+        document.getElementById("message").value = "";
+      }
+    });
+
+    var savedMessage = JSON.parse(localStorage.getItem("chat_message"));
+    if (savedMessage && savedMessage.user !== username) {
+      displayMessage(savedMessage.user, savedMessage.message, savedMessage.avatar);
+      localStorage.removeItem("chat_message");
+    }
+
+    window.addEventListener("storage", function(event) {
+      if (event.key === "chat_message" && event.newValue) {
+        var messageData = JSON.parse(event.newValue);
+        if (messageData.user !== username) {
+          displayMessage(messageData.user, messageData.message, messageData.avatar);
+        }
+      }
+    });
+
+    // Music player functionality
+    document.getElementById("play").addEventListener("click", function() {
+      var musicURL = document.getElementById("music-url").value.trim();
+      if (musicURL !== "") {
+        var videoPlayer = document.createElement("video");
+        videoPlayer.controls = true;
+        videoPlayer.autoplay = true;
+        videoPlayer.loop = true;
+        videoPlayer.style.width = "100%";
+        videoPlayer.style.height = "auto";
+        var source = document.createElement("source");
+        source.src = musicURL;
+        videoPlayer.appendChild(source);
+        document.getElementById("music-player").appendChild(videoPlayer);
+      }
+    });
+
+    document.getElementById("pause").addEventListener("click", function() {
+      var videoPlayer = document.querySelector("video");
+      if (videoPlayer) {
+        videoPlayer.pause();
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+

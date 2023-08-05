@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Username Selection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Chat</h1>
+  <input type="text" id="username" placeholder="Enter your username...">
+  <input type="file" id="avatar" accept="image/*" onchange="previewImage(event)">
+  <div id="preview-container"></div>
+  <button id="submit">Start Chat</button>
+
+  <script>
+    document.getElementById("submit").addEventListener("click", function() {
+      var username = document.getElementById("username").value.trim();
+      if (username !== "") {
+        localStorage.setItem("chat_username", username);
+        var avatarDataUrl = localStorage.getItem("chat_avatar");
+        if (avatarDataUrl) {
+          localStorage.removeItem("chat_avatar");
+          localStorage.setItem("chat_avatar_" + username, avatarDataUrl);
+        }
+        window.location.href = "chat.html";
+      }
+    });
+
+    function previewImage(event) {
+      var file = event.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function() {
+        var dataURL = reader.result;
+        var previewContainer = document.getElementById("preview-container");
+        previewContainer.innerHTML = "<img src='" + dataURL + "'>";
+        localStorage.setItem("chat_avatar", dataURL);
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
+
+
+
